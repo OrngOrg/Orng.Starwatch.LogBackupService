@@ -1,0 +1,18 @@
+﻿[Unit]
+Description=Starwatch Log Backup Service
+After=network.target
+
+[Service]
+Environment=DOTNET_ROOT=/usr/lib64/dotnet
+Type=simple
+ExecStart=/usr/bin/dotnet /orng/bin/Orng.Starwatch.LogBackupService.dll
+SyslogIdentifier=StarwatchLogBackupService
+
+# Use systemctl to stop the service.
+Restart=always
+
+# If Starwatch is offline and the program becomes an unstable restart loop, it will just waste resources.
+RestartSec=300
+
+[Install]
+WantedBy=multi-user.target

@@ -19,5 +19,14 @@ Helper.ReadConfigFile();
 if (Helper.Config is null)
     throw new Exception("Failed to load config.");
 
+if (Helper.Config.EnableDebugOutput)
+{
+    Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Debug()
+        .WriteTo.Console()
+        .CreateLogger();
+}
+    
+
 var lm = new LogMonitor(Helper.Config);
 lm.Start();

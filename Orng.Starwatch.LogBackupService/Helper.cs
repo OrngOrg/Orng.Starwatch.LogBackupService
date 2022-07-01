@@ -31,6 +31,10 @@ public static class Helper
             try
             {
                 Config = ServiceConfig.ReadFromFile("config");
+
+                if (Config is not null) // Update with new config parameters if they exist.
+                    Config.WriteToFile("config");
+
             }
             catch (Exception ex)
             {

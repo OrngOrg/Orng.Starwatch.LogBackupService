@@ -1,6 +1,7 @@
 ﻿using Orng.Starwatch.API;
 using System.IO;
 using Serilog;
+using System.Globalization;
 
 namespace Orng.Starwatch.LogBackupService;
 
@@ -9,7 +10,6 @@ public class LogMonitor
     private readonly ServiceConfig config;
 
     public LogMonitor(ServiceConfig config) => this.config = config;
-
 
     // Worker 
     public bool ShouldStop { get; set; } = false;
@@ -49,15 +49,13 @@ public class LogMonitor
     // Logic
 
     private const int SignatureLength = 256;
-    private readonly byte[] currentSignature = new byte[SignatureLength];      // Used to trigger downloads
-    private readonly byte[] signatureCheckBuffer = new byte[SignatureLength];  // Used for log1
+    private readonly byte[] currentSignature      = new byte[SignatureLength]; // Used to trigger downloads
+    private readonly byte[] signatureCheckBuffer  = new byte[SignatureLength]; // Used for log1
     private readonly byte[] signatureCheckBuffer2 = new byte[SignatureLength]; // Used for log2+
     private byte[] downloadBuffer = new byte[0];
     private const string LastPath = "last.log";
     private const string TmpPath = "log.tmp";
     private const string SignatureList = "signatures";
-    private const string DateFormat = "MMMM dd yyyy @ HH mm";
-    private const string OutputFilename = "{0}.log.{1}"; // where {0} is DateFormat, {1} is the log number.
     private ApiClient? cli = null;
 
     private void Init ()
@@ -150,7 +148,12 @@ public class LogMonitor
     {
         
         DateTime now = DateTime.Now;
-        string filename = string.Format(OutputFilename, now.ToString(DateFormat), i);
+
+        string filename = string.Format(
+            config.LogFilenameFormat, 
+            now.ToString(config.DateFormat, config.DateFormatCultureParsed), 
+            i
+        );
 
         Log.Debug($"CopyTmp {path} to {config.LogOutputPath}{filename}");
 
